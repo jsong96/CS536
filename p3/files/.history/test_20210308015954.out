@@ -1,0 +1,4 @@
+int x;
+boolean y;
+void z;
+struct s t1;

@@ -1,0 +1,11 @@
+struct a {
+    int a;
+    int c;
+    struct foo bar;
+};
+int x;
+int y;
+int z;
+struct a b;
+int f() {
+}

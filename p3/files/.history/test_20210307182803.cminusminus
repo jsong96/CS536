@@ -1,0 +1,8 @@
+int x;
+int y;
+bool a; 
+void b;
+struct point {
+   int    x;
+   int    y;
+};

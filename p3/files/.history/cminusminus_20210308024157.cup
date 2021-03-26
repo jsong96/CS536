@@ -1,0 +1,220 @@
+/**********************************************************************
+ Java CUP specification for a parser for C-- programs.
+ **********************************************************************/
+
+import java_cup.runtime.*;
+import java.util.*;
+
+/*
+ * The code below redefines method syntax_error to give better error messages
+ * than just "Syntax error".
+ */
+parser code {:
+
+public void syntax_error(Symbol currToken) {
+    if (currToken.value == null) {
+        ErrMsg.fatal(0,0, "Syntax error at end of file");
+    }
+    else {
+        ErrMsg.fatal(((TokenVal)currToken.value).linenum,
+                     ((TokenVal)currToken.value).charnum,
+                     "Syntax error");
+    }
+    System.exit(-1);
+}
+:};
+
+
+/* Terminals (tokens returned by the scanner). */
+terminal                INT;
+terminal                BOOL;
+terminal                VOID;
+terminal                TRUE;
+terminal                FALSE;
+terminal                STRUCT;
+terminal                CIN;
+terminal                COUT;
+terminal                IF;
+terminal                ELSE;
+terminal                WHILE;
+terminal		REPEAT;
+terminal                RETURN;
+terminal IdTokenVal     ID;
+terminal IntLitTokenVal INTLITERAL;
+terminal StrLitTokenVal STRINGLITERAL;
+terminal                LCURLY;
+terminal                RCURLY;
+terminal                LPAREN;
+terminal                RPAREN;
+terminal                SEMICOLON;
+terminal                COMMA;
+terminal                DOT;
+terminal                WRITE;
+terminal                READ;
+terminal                PLUSPLUS;
+terminal                MINUSMINUS;
+terminal                PLUS;
+terminal                MINUS;
+terminal                TIMES;
+terminal                DIVIDE;
+terminal                NOT;
+terminal                AND;
+terminal                OR;
+terminal                EQUALS;
+terminal                NOTEQUALS;
+terminal                LESS;
+terminal                GREATER;
+terminal                LESSEQ;
+terminal                GREATEREQ;
+terminal                ASSIGN;
+
+
+/* Non-terminals
+ *
+ * NOTE: You will need to add more non-terminals to this list as you
+ *       add productions to the grammar below.
+ */
+non terminal ProgramNode      program;
+non terminal LinkedList       declList;
+non terminal DeclNode         decl;
+non terminal VarDeclNode      varDecl;
+non terminal FnDeclNode       funDecl;
+non terminal FormalDeclNode   formDecl;
+non terminal StructDeclNode   strDecl;
+non terminal LinkedList       structBody;
+non terminal TypeNode         type;
+non terminal IdNode           id;
+non terminal ExpNode          exp;
+non terminal StmtNode         state;
+non terminal CallExpNode      fncall;
+non terminal LinkedList      actualList;
+non terminal ExpNode   loc;
+
+
+
+/* Precedences
+ *
+ * NOTE: Add precedence and associativity declarations here.
+ *
+ */
+
+
+start with program;
+
+
+/* The grammar with actions
+ *
+ * NOTE: add more grammar rules below.
+ *
+ */
+program         ::= declList: d
+                {: RESULT = new ProgramNode(new DeclListNode(d));
+                :}
+                ;
+
+declList        ::= declList:dl decl:d
+                {: dl.addLast(d);
+                   RESULT = dl;
+                :}
+                | /* epsilon */
+                {: RESULT = new LinkedList<DeclNode>();
+                :}
+                ;
+
+decl            ::= varDecl:v
+                {: RESULT = v;
+                :}
+                ;
+
+varDecl         ::= 
+                type:t id:i SEMICOLON
+                {: RESULT = new VarDeclNode(t, i, VarDeclNode.NOT_STRUCT); :}
+                |
+                STRUCT ID:i ID:j SEMICOLON
+                {: 
+                RESULT = new VarDeclNode(new StructNode(new IdNode(i.linenum, i.charnum, i.idVal)), new IdNode(j.linenum, j.charnum, j.idVal), 0); :};
+
+strDecl         ::= STRUCT id:i LCURLY structBody:s RCURLY SEMICOLON      
+                {: 
+                    RESULT = new StructDeclNode(i, new DeclListNode(s));
+                :}
+                ;
+
+structBody      ::= structBody:s varDecl:v
+                {:  
+                    s.add(v);
+                    RESULT = s;
+                :}
+                | varDecl:v
+                {: 
+                    LinkedList<DeclNode> vl = new LinkedList<DeclNode>();
+                    vl.addLast(v);
+                    RESULT = vl;
+                :}
+                ;
+
+term            ::= loc:loc
+                {: RESULT = loc; :}
+                | INTLITERAL:it
+                {: RESULT  =  new IntLitNode(it.linenum, it.charnum, it.intVal); :}
+                | STRINGLITERAL:str
+                {: RESULT = new StringLitNode(str.linenum, str.charnum, str.strVal); :}
+                | TRUE:t
+                {: RESULT = new TrueNode(t.linenum, t.charnum); :}
+                | FALSE:f
+                {: RESULT = new FalseNode(f.linenum, f.charnum); :}
+                | LPAREN exp:e RPAREN
+                {: 
+                    e.hasParen = true;
+                    RESULT = e;
+                :}
+                | fncall:fc
+                {: RESULT = fc;:}
+                ;
+
+fncall          ::=  id:i LPAREN RPAREN
+                {: 
+                    RESULT =  new CallExpNode(i); 
+                :}
+                | id:i LPAREN actualList:a RPAREN  
+                {: 
+                    RESULT = new CallExpNode(i, new ExpListNode(a));
+                :}
+                ;
+
+actualList      ::= exp:e
+                {: 
+                    LinkedList<ExpNode> tmp = new LinkedList<ExpNode>();
+                    tmp.add(e);
+                    RESULT = tmp;
+                :}
+                | actualList:a COMMA exp:e
+                {:
+                    a.addLast(e);
+                    RESULT = a;
+                :}    
+                ;
+
+type            ::= INT
+                {: RESULT = new IntNode();
+                :}
+                | BOOL
+                {:  RESULT = new BoolNode();
+                :}
+                | VOID
+                {: RESULT = new VoidNode();
+                :}
+                ;
+
+
+loc             ::= id:i
+                {: RESULT = i; :}
+                | loc:ic DOT id:i
+                {: RESULT =  new DotAccessExpNode(ic, i);:};
+
+
+id              ::= ID:i
+                {: RESULT = new IdNode(i.linenum, i.charnum, i.idVal);
+                :}
+                ;  
+    

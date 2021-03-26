@@ -1,0 +1,5 @@
+struct s t1;
+int x;
+void a;
+bool b;
+foo();

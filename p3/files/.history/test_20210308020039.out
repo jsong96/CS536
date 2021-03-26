@@ -1,0 +1,7 @@
+int x;
+boolean y;
+void z;
+struct s t1;
+struct S {
+  int i;
+};

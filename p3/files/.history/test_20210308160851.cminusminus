@@ -1,0 +1,10 @@
+int x;
+bool y;
+void z;
+struct s t;
+void foo() {}
+struct s {
+  int x;
+  int y;
+  int z;
+}

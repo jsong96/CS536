@@ -1,0 +1,12 @@
+int x;
+bool y;
+void z;
+struct s t;
+void foo() {}
+cout >> output;
+cin << input;
+struct s {
+  int x;
+  int y;
+  int z;
+};

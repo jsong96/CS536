@@ -1,0 +1,6 @@
+int x;
+int y;
+bool a; 
+void b;
+bool a = true;
+false;

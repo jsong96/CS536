@@ -1,0 +1,16 @@
+int x;
+bool y;
+void z;
+struct s t;
+void foo() {}
+struct s {
+  int x;
+  int y;
+  int z;
+};
+cin >> input;
+cout << output;
+int bar(int a) {
+  a++;
+  return a;
+}

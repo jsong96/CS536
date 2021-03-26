@@ -1,0 +1,9 @@
+struct s {
+    int a;
+    int b;
+};
+int x;
+int y;
+int z;
+struct a b;
+int foo() {}

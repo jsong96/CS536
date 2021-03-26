@@ -1,0 +1,11 @@
+int x;
+bool y;
+void z;
+struct s t;
+void foo() {}
+int i = 1;
+struct s {
+  int x;
+  int y;
+  int z;
+};
