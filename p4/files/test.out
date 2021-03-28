@@ -3,6 +3,9 @@ struct Point{
     int y;
 };
 
+int x;
+int y;
+struct Point p1;
 int f(int x, bool b) {
 }
 
@@ -16,9 +19,17 @@ void g() {
     g();
 }
 
-struct Point{
-    int x;
-    int y;
-};
+int foo(int a, int b) {
+    a = (b + 1);
+    return a(int);
+}
 
-void x;
+int bar(bool test, int x) {
+    if ((test == true)) {
+        return x(int);
+    }
+    else {
+        return (x - 1);
+    }
+}
+

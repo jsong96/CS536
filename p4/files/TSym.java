@@ -1,4 +1,4 @@
-public class TSym {
+  public class TSym {
     private String type;
 
     public TSym(String type) {
@@ -14,11 +14,11 @@ public class TSym {
     }
 }
 
-class fTSym extends TSym {
+class funcDeclTSym extends TSym {
     private String paramType;
     private String returnType;
 
-    public fTSym(String rType, String pType) {
+    public funcDeclTSym(String rType, String pType) {
         super("function");
         this.paramType = pType;
         this.returnType = rType;
@@ -28,7 +28,7 @@ class fTSym extends TSym {
         return this.paramType;
     }
 
-    public String toString() {
-        return this.paramType;
+    public String getRType() {
+        return this.returnType;
     }
 }

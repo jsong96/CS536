@@ -1,1 +1,35 @@
+struct Point {
+    int x;
+    int y;
+};
 
+int x;
+int y;
+
+struct Point p1;
+
+int f(int x, bool b) { }
+void g() {
+    int a;
+    bool b;
+    int a;
+    struct Point p;
+    p.x = a;
+    b = a == 3;
+    f(a + p.y*2, b);
+    g();
+}
+
+int foo (int a , int b) {
+    a = b + 1;
+    return a;
+}
+
+int bar (bool test, int x) {
+
+    if (test == true) {
+        return x;
+    } else {
+        return x - 1;
+    }
+}

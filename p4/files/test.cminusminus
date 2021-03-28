@@ -2,6 +2,12 @@ struct Point {
     int x;
     int y;
 };
+
+int x;
+int y;
+
+struct Point p1;
+
 int f(int x, bool b) { }
 void g() {
     int a;
@@ -12,9 +18,17 @@ void g() {
     f(a + p.y*2, b);
     g();
 }
-struct Point {
-    int x;
-    int y;
-};
 
-void x;
+int foo (int a , int b) {
+    a = b + 1;
+    return a;
+}
+
+int bar (bool test, int x) {
+
+    if (test == true) {
+        return x;
+    } else {
+        return x - 1;
+    }
+}
