@@ -251,8 +251,6 @@ class FnBodyNode extends ASTnode {
     }
 
     public void nameAnalysis(SymTable table) {
-        System.out.println("FunctionBody");
-        table.print();
         this.myDeclList.nameAnalysisFnbody(table);
         this.myStmtList.nameAnalysis(table);
     }
@@ -366,7 +364,7 @@ class VarDeclNode extends DeclNode {
         }
         // normal variable
         this.nameAnalysisVar(table);
-        table.print();
+        //table.print();
         return table;
  
     }
@@ -389,11 +387,13 @@ class VarDeclNode extends DeclNode {
 
         if (this.myType.getType().equals("struct")) {
             try {
-                TSym structSym = table.lookupGlobal(((StructNode)this.myType).getId().getStringval());
+                StructNode target = ((StructNode)this.myType);
+                TSym structSym = table.lookupGlobal(target.getId().getStringval());
                 TSym mySym = structTable.lookupGlobal(this.myId.getStringval());
+
                 if (structSym != null && mySym != null) {
-                    System.out.println("struct field inside a struct field: " + structSym.getType() + " " + mySym.getType() + " " + this.myId.getStringval());
-                    //this.myId.setStructDeclnode(structSym.getStructDecl(), mySym);
+                    mySym.setStructTable(structSym.getStructTable());
+                    mySym.setStructType(target.getId().getStringval());
                 }
             } catch (EmptySymTableException e) {
                 System.err.println(e);
@@ -1116,67 +1116,60 @@ class DotAccessExpNode extends ExpNode {
 
     public void nameAnalysis(SymTable table) {
         myLoc.nameAnalysis(table);
-        if (this.myLoc instanceof IdNode) {
-            IdNode locId = ((IdNode)this.myLoc);
-            try {
-                // find the lhs's TSym
-                TSym locSym = table.lookupGlobal(locId.getStringval());
-                if (locSym == null) {
-                    ErrMsg.fatal(locId.getLinenum(), locId.getCharnum(), "Undeclared identifier");
-                }
-                // get the Struct Table for the right struct type
-                SymTable structTable = locSym.getStructTable();
-                if (structTable == null) {
-                    ErrMsg.fatal(locId.getLinenum(), locId.getCharnum(), "Dot-access of non-struct type");
-                }
+        try {
+            // use recursion method to iterate lhs and check
+            SymTable structTable = this.nameAnalysisHelper(table);
+            if (structTable != null) {
                 // check if the field exists
                 TSym fieldExists = structTable.lookupGlobal(this.myId.getStringval());
                 if (fieldExists == null) {
                     ErrMsg.fatal(this.myId.getLinenum(), this.myId.getCharnum(), "Invalid struct field name");
                 } else {
-                    System.out.println("ID: " + this.myId.getStringval() + " Type: " + fieldExists.getType());
                     this.myId.setTSym(fieldExists);
                 }
-
-            } catch (EmptySymTableException e) {
-                System.err.println(e);
-                System.exit(-1);
             }
-        } else {
-            System.out.println("loc node not IdNode");
+        } catch (EmptySymTableException e) {
+            System.err.println(e);
+            System.exit(-1);
         }
     }
 
-    public StructDeclNode getLhsDeclNode(SymTable table) {
-        // case 1
+    public SymTable nameAnalysisHelper(SymTable table) throws EmptySymTableException {
+        
+        // the leftmost Id
         if (this.myLoc instanceof IdNode) {
-            try {
-                IdNode locId = ((IdNode)this.myLoc);
-
-                // search lhs id first, if does not exist, then err
-                TSym locSym = table.lookupGlobal(locId.getStringval());
-                if (locSym == null) {
-                    ErrMsg.fatal(locId.getLinenum(), locId.getCharnum(), "Undeclared identifier");
-                    return null;
-                }
-                System.out.println(locId.getStringval() + " type: " + locSym.getType());
-                locSym.getStructTable().print();
-
-                SymTable structT = locSym.getStructTable();
-                if (structT == null) {
-                    ErrMsg.fatal(locId.getLinenum(), locId.getCharnum(), "Dot-access of non-struct type");
-                    return null;
-                }
-
+            IdNode locId = ((IdNode)this.myLoc);
+            System.out.println("lhs: " + locId.getStringval() + " rhs: " + this.myId.getStringval());
+            // find the lhs's TSym
+            TSym locSym = table.lookupGlobal(locId.getStringval());
+            if (locSym == null) {
+                ErrMsg.fatal(locId.getLinenum(), locId.getCharnum(), "Undeclared identifier");
                 return null;
-                
-            } catch (EmptySymTableException e) {
-                System.err.println(e);
-                System.exit(-1);
             }
-            return ((IdNode)this.myLoc).getStructDeclNode();
+            // get the Struct Table for the right struct type
+            SymTable structTable = locSym.getStructTable();
+            if (structTable == null) {
+                ErrMsg.fatal(locId.getLinenum(), locId.getCharnum(), "Dot-access of non-struct type");
+                return null;
+            }
+            return structTable;
+        } else {
+            SymTable structTable = ((DotAccessExpNode) this.myLoc).nameAnalysisHelper(table);
+            System.out.println("lhs: " + ((DotAccessExpNode) this.myLoc).myId.getStringval() + " rhs: " + this.myId.getStringval());
+            structTable.print();
+            if (structTable != null) {
+                // check if the field exists
+                TSym fieldExists = structTable.lookupGlobal(((DotAccessExpNode) this.myLoc).myId.getStringval());
+                if (fieldExists == null) {
+                    return null;
+                } else {
+                    return fieldExists.getStructTable();
+                }
+            } else {    
+                return null;
+            }
+
         }
-        return null;
     }
 
     private ExpNode myLoc;
@@ -1201,7 +1194,6 @@ class AssignNode extends ExpNode {
 
     public void nameAnalysis(SymTable table) {
         this.myLhs.nameAnalysis(table);
-        System.out.println("assign check");
         this.myExp.nameAnalysis(table);
     }
 

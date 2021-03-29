@@ -1,42 +1,33 @@
-struct Point{
-    int x;
-    int y;
+int a;
+struct test_struct{
+    int size;
 };
 
+void func() {
+}
+
 int x;
-int y;
 int x;
-struct Point p1;
-struct p1{
+bool x;
+int x() {
+}
+
+struct x{
     int x;
 };
 
-int f(int x, bool b) {
+int x() {
 }
 
-void g() {
-    int a;
-    bool b;
-    int a;
-    struct Point p;
-    (p(struct)).x = a(int);
-    b(bool) = (a(int) == 3);
-    f(function)((a(int) + ((p(struct)).y * 2)), b(bool));
-    g(function)();
+int x() {
 }
 
-int foo(int a, int b) {
-    a(int) = (b(int) + 1);
-    return a(int);
-}
-
-int bar(bool test, int x) {
-    if (test(bool)) {
-        x(int) = (x(int) + 1);
-        return x(int);
-    }
-    else {
-        return (x(int) - 1);
-    }
+int foo() {
+    a(int) = not_dec;
+    not_dec = a(int);
+    undec_func();
+    a(int) = undec_func(a(int));
+    undec_func(undec_func(undec_func()));
+    return x(int);
 }
 

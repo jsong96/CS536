@@ -3,12 +3,41 @@ struct Point {
     int y;
 };
 
+int x;
+int y;
+struct Point p1;
+
+struct Line {
+    int val;
+    struct Point x;
+    struct Point y;
+};
+
 int f(int x, bool b) { }
 void g() {
     int a;
     bool b;
     struct Point p;
+    struct Line l;
     p.x = a;
+    l.val = 1;
+    l.x.y = 2;
     b = a == 3;
     f(a + p.y*2, b);
+    g();
+}
+
+int foo (int a , int b) {
+    a = b + 1;
+    return a;
+}
+
+int bar (bool test, int x) {
+
+    if (test) {
+        x = x + 1;
+        return x;
+    } else {
+        return x - 1;
+    }
 }

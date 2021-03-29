@@ -3,6 +3,15 @@ struct Point{
     int y;
 };
 
+int x;
+int y;
+struct Point p1;
+struct Line{
+    int val;
+    struct Point x;
+    struct Point y;
+};
+
 int f(int x, bool b) {
 }
 
@@ -10,8 +19,27 @@ void g() {
     int a;
     bool b;
     struct Point p;
+    struct Line l;
     (p(Point)).x(int) = a(int);
+    (l(Line)).val(int) = 1;
+    ((l(Line)).x(Point)).y(int) = 2;
     b(bool) = (a(int) == 3);
     f(int, bool->int)((a(int) + ((p(Point)).y(int) * 2)), b(bool));
+    g(void->void)();
+}
+
+int foo(int a, int b) {
+    a(int) = (b(int) + 1);
+    return a(int);
+}
+
+int bar(bool test, int x) {
+    if (test(bool)) {
+        x(int) = (x(int) + 1);
+        return x(int);
+    }
+    else {
+        return (x(int) - 1);
+    }
 }
 

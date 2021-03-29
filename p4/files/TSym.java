@@ -18,6 +18,10 @@ public class TSym {
         return type;
     }
 
+    public String getStructType() {
+        return this.structType;
+    }
+
     public String toString() {
         if (structType != null) {
             return this.structType;
