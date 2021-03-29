@@ -3,7 +3,6 @@ import java.util.LinkedList;
 
 public class TSym {
     private String type;
-    private StructDeclNode structDecl;
 
     public TSym(String type) {
         this.type = type;
@@ -15,14 +14,6 @@ public class TSym {
 
     public String toString() {
         return type;
-    }
-
-    public void setStructDecl(StructDeclNode structDecl) {
-        this.structDecl = structDecl;
-    }
-
-    public StructDeclNode getStructDecl () {
-        return this.structDecl;
     }
 }
 
