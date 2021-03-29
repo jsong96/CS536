@@ -3,9 +3,15 @@ import java.util.LinkedList;
 
 public class TSym {
     private String type;
+    private String structType;
+    private SymTable table;
 
     public TSym(String type) {
         this.type = type;
+    }
+
+    public void setStructType(String structType) {
+        this.structType = structType;
     }
 
     public String getType() {
@@ -13,7 +19,19 @@ public class TSym {
     }
 
     public String toString() {
-        return type;
+        if (structType != null) {
+            return this.structType;
+        } else {
+            return this.type;
+        }   
+    }
+
+    public SymTable getStructTable() {
+        return this.table;
+    }
+
+    public void setStructTable(SymTable table) {
+        this.table = table;
     }
 }
 
@@ -40,6 +58,6 @@ class funcDeclTSym extends TSym {
         if (params.equals("")) {
             params = "void";
         }
-        return params + "-> " + this.returnType;
+        return params + "->" + this.returnType;
     }
 }

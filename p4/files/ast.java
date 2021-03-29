@@ -333,7 +333,6 @@ class VarDeclNode extends DeclNode {
     }
 
     public SymTable nameAnalysis(SymTable table) {
-        System.out.println("VarDeclNode " + this.myType.getType() + " " + this.myId.getStringval());
         // check if the variable type is void
         if (this.myType.getType().equals("void")) {
             ErrMsg.fatal(myId.getLinenum(), myId.getCharnum(), "Non-function declared void");
@@ -349,10 +348,15 @@ class VarDeclNode extends DeclNode {
                 if (structSym == null || checkMultiDeclaredStruct(table) == false) {
                     return table;
                 }
+                
+                // add struct var
                 this.nameAnalysisVar(table);
+                // get struct var
                 TSym mySym = table.lookupGlobal(this.myId.getStringval());
-                System.out.println( mySym.getType() + " " + this.myId.getStringval() + " " + structSym.getType() + " " + structId.getStringval());
-                this.myId.setStructDeclnode(structId.getStructDeclNode());
+                mySym.setStructType(structId.getStringval());
+                // link Struct table
+                mySym.setStructTable(structSym.getStructTable());
+                //System.out.println( mySym.getType() + " " + this.myId.getStringval() + " " + structSym.getType() + " " + structId.getStringval());
                 
                 return table;
             } catch (EmptySymTableException e) {
@@ -388,7 +392,7 @@ class VarDeclNode extends DeclNode {
                 TSym structSym = table.lookupGlobal(((StructNode)this.myType).getId().getStringval());
                 TSym mySym = structTable.lookupGlobal(this.myId.getStringval());
                 if (structSym != null && mySym != null) {
-                    System.out.println(structSym.getType() + " " + mySym.getType() + " " + this.myId.getStringval());
+                    System.out.println("struct field inside a struct field: " + structSym.getType() + " " + mySym.getType() + " " + this.myId.getStringval());
                     //this.myId.setStructDeclnode(structSym.getStructDecl(), mySym);
                 }
             } catch (EmptySymTableException e) {
@@ -452,7 +456,6 @@ class FnDeclNode extends DeclNode {
         // cluster function param definitions to a funcDeclTSym and save it to the SymbolTable
         LinkedList<String> paramTypes = this.myFormalsList.getParamList();
         funcDeclTSym funcParamSym = new funcDeclTSym(this.myType.getType(), paramTypes);
-        //System.out.println(funcParamSym.toString());
         try {
             table.addDecl(this.myId.getStringval(), funcParamSym);
         } catch (DuplicateSymException e) {
@@ -538,8 +541,16 @@ class StructDeclNode extends DeclNode {
     }
 
     public SymTable nameAnalysis(SymTable table) {
-        System.out.println("StructDecl " +this.myId.getStringval());
+        //StructDeclTSym structSym = new StructDeclTSym(this.type);
         TSym structSym = new TSym(this.type);
+        // make a SymTable for each struct name
+        this.mySymTable = new SymTable();
+
+        this.myId.setStructDeclnode(this);
+
+        this.myDeclList.nameAnalysisStructBody(table, this.mySymTable);
+
+        structSym.setStructTable(this.mySymTable);
         try {
             table.addDecl(this.myId.getStringval(), structSym);
         } catch (DuplicateSymException e) {
@@ -548,15 +559,7 @@ class StructDeclNode extends DeclNode {
             System.err.println(e);
             System.exit(-1);
         }
-        // make a SymTable for each struct name
-        this.mySymTable = new SymTable();
-        
-        this.myId.setStructDeclnode(this);
 
-        this.myDeclList.nameAnalysisStructBody(table, this.mySymTable);
-        table.print();
-        this.mySymTable.print();
-        this.myId.getStructDeclNode().getSymTable().print();
         return table;
     }
 
@@ -1050,7 +1053,7 @@ class IdNode extends ExpNode {
         p.print(myStrVal);
         if (this.symType != null) {
             p.print("(");
-            p.print(this.symType.getType());
+            p.print(this.symType.toString());
             p.print(")");
         }
     }
@@ -1060,11 +1063,7 @@ class IdNode extends ExpNode {
             this.symType = table.lookupGlobal(this.myStrVal);
             if (this.symType == null) {
                 ErrMsg.fatal(myLineNum, myCharNum, "Undeclared identifier");
-            } else {
-                //this.myStruct = this.symType.getStructDecl();
             }
-    
-            System.out.println(this.symType);
         } catch (EmptySymTableException e) {
             System.err.println(e);
             System.exit(-1);
@@ -1117,28 +1116,35 @@ class DotAccessExpNode extends ExpNode {
 
     public void nameAnalysis(SymTable table) {
         myLoc.nameAnalysis(table);
-        System.out.println("DotAccess " + this.myId.getStringval());
-        System.out.println(((IdNode) this.myLoc).getStringval() + " " + this.myId.getStringval());
-        table.print();
-        StructDeclNode lhs = this.getLhsDeclNode(table);
-        if (lhs == null) {
-            
-            System.exit(0);
+        if (this.myLoc instanceof IdNode) {
+            IdNode locId = ((IdNode)this.myLoc);
+            try {
+                // find the lhs's TSym
+                TSym locSym = table.lookupGlobal(locId.getStringval());
+                if (locSym == null) {
+                    ErrMsg.fatal(locId.getLinenum(), locId.getCharnum(), "Undeclared identifier");
+                }
+                // get the Struct Table for the right struct type
+                SymTable structTable = locSym.getStructTable();
+                if (structTable == null) {
+                    ErrMsg.fatal(locId.getLinenum(), locId.getCharnum(), "Dot-access of non-struct type");
+                }
+                // check if the field exists
+                TSym fieldExists = structTable.lookupGlobal(this.myId.getStringval());
+                if (fieldExists == null) {
+                    ErrMsg.fatal(this.myId.getLinenum(), this.myId.getCharnum(), "Invalid struct field name");
+                } else {
+                    System.out.println("ID: " + this.myId.getStringval() + " Type: " + fieldExists.getType());
+                    this.myId.setTSym(fieldExists);
+                }
+
+            } catch (EmptySymTableException e) {
+                System.err.println(e);
+                System.exit(-1);
+            }
+        } else {
+            System.out.println("loc node not IdNode");
         }
-        //System.out.println(lhs.getIdNode().getStringval());
-        //SymTable lhsTable = lhs.getSymTable();
-        //lhsTable.print();
-        // try {
-        //     TSym s = lhsTable.lookupGlobal(this.myId.getStringval());
-        //     if (s == null) {
-        //         ErrMsg.fatal(this.myId.getLinenum(), this.myId.getCharnum(), "Invalid struct field name");
-        //     } else {
-        //         this.myId.setTSym(s);
-        //     }
-        // } catch (EmptySymTableException e) {
-        //     System.err.println(e);
-        //     System.exit(-1);
-        // }
     }
 
     public StructDeclNode getLhsDeclNode(SymTable table) {
@@ -1146,10 +1152,7 @@ class DotAccessExpNode extends ExpNode {
         if (this.myLoc instanceof IdNode) {
             try {
                 IdNode locId = ((IdNode)this.myLoc);
-                if (locId.getStructDeclNode() == null) {
-                    System.out.println("no structDecl");
-                }
-                System.out.println("searching structDeclNode: " + locId.getStringval());
+
                 // search lhs id first, if does not exist, then err
                 TSym locSym = table.lookupGlobal(locId.getStringval());
                 if (locSym == null) {
@@ -1157,11 +1160,14 @@ class DotAccessExpNode extends ExpNode {
                     return null;
                 }
                 System.out.println(locId.getStringval() + " type: " + locSym.getType());
-                
-                // if (.getStructDeclNode() == null) {
-                //      ErrMsg.fatal(locId.getLinenum(), locId.getCharnum(), "Dot-access of non-struct type");
-                //      return null;
-                // }
+                locSym.getStructTable().print();
+
+                SymTable structT = locSym.getStructTable();
+                if (structT == null) {
+                    ErrMsg.fatal(locId.getLinenum(), locId.getCharnum(), "Dot-access of non-struct type");
+                    return null;
+                }
+
                 return null;
                 
             } catch (EmptySymTableException e) {
@@ -1169,27 +1175,7 @@ class DotAccessExpNode extends ExpNode {
                 System.exit(-1);
             }
             return ((IdNode)this.myLoc).getStructDeclNode();
-        } /*else {
-            //case 2
-            StructDeclNode lhsDecl = ((DotAccessExpNode) this.myLoc).getLhsDeclNode(table);
-            if (lhsDecl == null) {
-                return null;
-            }
-            SymTable leftTable = lhsDecl.getSymTable();
-            leftTable.print();
-
-            try {
-                TSym s = leftTable.lookupGlobal(((DotAccessExpNode)this.myLoc).myId.getStringval());
-                if (s == null) {
-                    return null;
-                } else {
-                    //return s.getStructDecl();
-                }
-            } catch (EmptySymTableException e) {
-                System.err.println(e);
-                System.exit(-1);
-            }
-        }*/
+        }
         return null;
     }
 
@@ -1215,6 +1201,7 @@ class AssignNode extends ExpNode {
 
     public void nameAnalysis(SymTable table) {
         this.myLhs.nameAnalysis(table);
+        System.out.println("assign check");
         this.myExp.nameAnalysis(table);
     }
 
