@@ -3,9 +3,6 @@ struct Point{
     int y;
 };
 
-int x;
-int y;
-struct Point p1;
 int f(int x, bool b) {
 }
 
@@ -13,23 +10,8 @@ void g() {
     int a;
     bool b;
     struct Point p;
-    (p).x = a;
-    b = (a == 3);
-    f((a + ((p).y * 2)), b);
-    g();
-}
-
-int foo(int a, int b) {
-    a = (b + 1);
-    return a(int);
-}
-
-int bar(bool test, int x) {
-    if ((test == true)) {
-        return x(int);
-    }
-    else {
-        return (x - 1);
-    }
+    (p(struct)).x(int) = a(int);
+    b(bool) = (a(int) == 3);
+    f(function)((a(int) + ((p(struct)).y(int) * 2)), b(bool));
 }
 

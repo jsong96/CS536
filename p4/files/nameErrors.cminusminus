@@ -5,8 +5,11 @@ struct Point {
 
 int x;
 int y;
-
+int x;
 struct Point p1;
+struct p1 {
+    int x;
+};
 
 int f(int x, bool b) { }
 void g() {
@@ -27,7 +30,8 @@ int foo (int a , int b) {
 
 int bar (bool test, int x) {
 
-    if (test == true) {
+    if (test) {
+        x = x + 1;
         return x;
     } else {
         return x - 1;

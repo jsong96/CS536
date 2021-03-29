@@ -5,7 +5,12 @@ struct Point{
 
 int x;
 int y;
+int x;
 struct Point p1;
+struct p1{
+    int x;
+};
+
 int f(int x, bool b) {
 }
 
@@ -14,23 +19,24 @@ void g() {
     bool b;
     int a;
     struct Point p;
-    (p).x = a;
-    b = (a == 3);
-    f((a + ((p).y * 2)), b);
-    g();
+    (p(struct)).x = a(int);
+    b(bool) = (a(int) == 3);
+    f(function)((a(int) + ((p(struct)).y * 2)), b(bool));
+    g(function)();
 }
 
 int foo(int a, int b) {
-    a = (b + 1);
+    a(int) = (b(int) + 1);
     return a(int);
 }
 
 int bar(bool test, int x) {
-    if ((test == true)) {
+    if (test(bool)) {
+        x(int) = (x(int) + 1);
         return x(int);
     }
     else {
-        return (x - 1);
+        return (x(int) - 1);
     }
 }
 
