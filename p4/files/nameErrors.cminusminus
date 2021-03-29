@@ -1,27 +1,54 @@
 int a;
-struct test_struct {
-    int size;
+int b;
+bool t;
+int t; // Multiply declared identifier
+
+struct area {
+    int width;
+    int height;
 };
 
-void func() {}
+void foo() {}
 
 int x;
-int x;
-bool x;
-int x() {}
-struct x {
+int x; // Multiply declared identifier
+bool x; // Multiply declared identifier
+int x() {} // Multiply declared identifier
+struct x { // Multiply declared identifier
     int x;
 };
-int x () {}
-int x () {}
+int x () {} // Multiply declared identifier
+int x () {} // Multiply declared identifier
 
-int foo() {
-    a = not_dec;
-    not_dec = a;
+void x; // Non-function declared void
+void q; // NOn-function declared void
 
-    undec_func();
-    a = undec_func(a);
-    undec_func(undec_func(undec_func()));
+int bar() {
+    a = unknown; // undeclared ideentifier
+    unknown = a; // undeclared ideentifier
+
+    unknown(); // undeclared ideentifier
+    a = unknown(a); // undeclared ideentifier
+    unknown(unknown(unknown())); // undeclared identifier
 
     return x;
 }
+
+struct area a; // Multiply declared identifier
+struct area homeArea;
+struct volume sphere; // Invalid name of struct type
+
+int findArea(int a, int b) {
+    struct area A;
+    a.x = 1; // Dot-access of non-struct type
+    b.y = 0; // Dot-access of non-struct type
+    x.ty = 1; // Dot-access of non-struct type
+    A.width = a;
+    A.height = b;
+    A.area = a * b; // Invalid struct field name
+    A.submit = a + b; // Invalid struct field name
+    return a * b;
+}
+
+struct testInvalid test1; // Invalid name of struct type
+struct testInvalidSecond test2; // Invalid name of struct type

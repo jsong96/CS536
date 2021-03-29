@@ -159,7 +159,7 @@ class DeclListNode extends ASTnode {
     }
 
     public SymTable nameAnalysis(SymTable table) {
-        // from programNode
+        // from programNode, pass down the table to DeclNodes
         for (DeclNode dNode : myDecls) {
             dNode.nameAnalysis(table);
         }
@@ -168,11 +168,10 @@ class DeclListNode extends ASTnode {
 
     public void nameAnalysisFnbody(SymTable table) {
         HashMap<String, Integer> countDecl = new HashMap<>();
-        // from FnBodynode, check multiply declared variables inside a function body
+        // from FnBodynode, count number of declarations for each variable declaration
         for (DeclNode d : myDecls) {
             IdNode i = d.getIdNode();
             String idName = i.getStringval();
-            //System.out.println("nameAnalysisFnbody " + idName);
             if (countDecl.get(idName) == null) {
                 countDecl.put(idName, 1);
                 try {
@@ -340,10 +339,10 @@ class VarDeclNode extends DeclNode {
         // check if the variable starts with struct
         if (this.myType.getType().equals("struct")) {
             try {
-                // check multideclared 
+                // check multideclared and if the struct var decl is valid 
                 IdNode structId = ((StructNode)this.myType).getId();
                 TSym structSym = table.lookupGlobal(structId.getStringval());
-                if (structSym == null || checkMultiDeclaredStruct(table) == false) {
+                if (checkStructDecl(table) == false || structSym == null) {
                     return table;
                 }
                 
@@ -354,8 +353,6 @@ class VarDeclNode extends DeclNode {
                 mySym.setStructType(structId.getStringval());
                 // link Struct table
                 mySym.setStructTable(structSym.getStructTable());
-                //System.out.println( mySym.getType() + " " + this.myId.getStringval() + " " + structSym.getType() + " " + structId.getStringval());
-                
                 return table;
             } catch (EmptySymTableException e) {
                 System.err.println(e);
@@ -370,7 +367,7 @@ class VarDeclNode extends DeclNode {
     }
 
     public void nameAnalysisVar(SymTable table) {
-        // add normal variable declaration to current table
+        // add normal variable declaration to the current table
         TSym tmpSym = new TSym(this.myType.getType());
         try {
             table.addDecl(this.myId.getStringval(), tmpSym);
@@ -382,9 +379,11 @@ class VarDeclNode extends DeclNode {
     }
 
     public void nameAnalysisStruct(SymTable table, SymTable structTable) {
+        // Adds variables declared inside current struct body to the struct table
         this.nameAnalysisVar(structTable);
-        this.checkMultiDeclaredStruct(table);
+        this.checkStructDecl(table);
 
+        // if any variables inside the struct body is type struct, link corresponding struct tables
         if (this.myType.getType().equals("struct")) {
             try {
                 StructNode target = ((StructNode)this.myType);
@@ -402,7 +401,8 @@ class VarDeclNode extends DeclNode {
         }
     }
 
-    public boolean checkMultiDeclaredStruct(SymTable table) {
+    public boolean checkStructDecl(SymTable table) {
+        // check if the struct decl exists
         IdNode structId = ((StructNode)this.myType).getId(); 
         try {
             TSym sym = table.lookupGlobal(structId.getStringval());
@@ -541,7 +541,6 @@ class StructDeclNode extends DeclNode {
     }
 
     public SymTable nameAnalysis(SymTable table) {
-        //StructDeclTSym structSym = new StructDeclTSym(this.type);
         TSym structSym = new TSym(this.type);
         // make a SymTable for each struct name
         this.mySymTable = new SymTable();
@@ -1139,7 +1138,6 @@ class DotAccessExpNode extends ExpNode {
         // the leftmost Id
         if (this.myLoc instanceof IdNode) {
             IdNode locId = ((IdNode)this.myLoc);
-            System.out.println("lhs: " + locId.getStringval() + " rhs: " + this.myId.getStringval());
             // find the lhs's TSym
             TSym locSym = table.lookupGlobal(locId.getStringval());
             if (locSym == null) {
@@ -1154,9 +1152,8 @@ class DotAccessExpNode extends ExpNode {
             }
             return structTable;
         } else {
+            // if the leftmost Id is not IdNode -> more dot access exists in lhs, iterate to check each dot access
             SymTable structTable = ((DotAccessExpNode) this.myLoc).nameAnalysisHelper(table);
-            System.out.println("lhs: " + ((DotAccessExpNode) this.myLoc).myId.getStringval() + " rhs: " + this.myId.getStringval());
-            structTable.print();
             if (structTable != null) {
                 // check if the field exists
                 TSym fieldExists = structTable.lookupGlobal(((DotAccessExpNode) this.myLoc).myId.getStringval());

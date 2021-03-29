@@ -28,11 +28,19 @@ void g() {
 }
 
 int foo (int a , int b) {
+    while (a < 3) {
+        a++;
+    }
     a = b + 1;
     return a;
 }
 
 int bar (bool test, int x) {
+
+    repeat(x == 1) {
+        test = false;
+        x++;
+    }
 
     if (test) {
         x = x + 1;

@@ -15,6 +15,7 @@ class ErrMsg {
      * @param msg     associated message for error
      */
     static void fatal(int lineNum, int charNum, String msg) {
+        hasError = true;
         System.err.println(lineNum + ":" + charNum + " ***ERROR*** " + msg);
     }
 
