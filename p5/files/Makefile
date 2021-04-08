@@ -57,7 +57,7 @@ EmptySymTableException.class: EmptySymTableException.java
 # test
 #
 test:
-	java -cp $(CP) P5 test.cminusminus test.out
+	#java -cp $(CP) P5 test.cminusminus test.out
 	java -cp $(CP) P5 typeErrors.cminusminus testErr.out
 
 ###
