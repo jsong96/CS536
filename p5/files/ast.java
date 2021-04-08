@@ -140,8 +140,8 @@ class ProgramNode extends ASTnode {
     /**
      * typeCheck
      */
-    public boolean typeCheck() {
-        return myDeclList.typeCheck();
+    public void typeCheck() {
+        myDeclList.typeCheck();
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -180,16 +180,12 @@ class DeclListNode extends ASTnode {
         }
     }
 
-    public boolean typeCheck() {
-        boolean result = true;
+    public void typeCheck() {
         for (DeclNode node : myDecls) {
             if (node instanceof FnDeclNode) {
-                if (((FnDeclNode) node).typeCheck() == false) {
-                    result = false;
-                }
+                ((FnDeclNode) node).typeCheck();
             }
         }
-        return result;
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -1015,11 +1011,12 @@ class IfStmtNode extends StmtNode {
     }
 
     public boolean typeCheck(TypeNode t) {
-        Type result = myExp.typeCheck();
-        myStmtList.typeCheck(t);
+        Type conditionType = myExp.typeCheck();
         IdNode id = myExp.getIdNode();
 
-        if (!(result instanceof BoolType)) {
+        myStmtList.typeCheck(t);
+
+        if (!(conditionType instanceof BoolType)) {
             id.notifyError("Non-bool expression used as an if condition");
             return false;
         }
@@ -1082,8 +1079,20 @@ class IfElseStmtNode extends StmtNode {
     }
 
     public boolean typeCheck(TypeNode t) {
+        boolean hasErr = false;
+        Type conditionType = myExp.typeCheck();
+        IdNode id = myExp.getIdNode();
 
-        return false;
+        if (!(conditionType instanceof BoolType)) {
+            id.notifyError("Non-bool expression used as an if condition");
+            hasErr = true;
+        }
+
+        if (hasErr == false && myThenStmtList.typeCheck(t) && myElseStmtList.typeCheck(t)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -1136,6 +1145,18 @@ class WhileStmtNode extends StmtNode {
     }
 
     public boolean typeCheck(TypeNode t) {
+        Type conditionType = myExp.typeCheck();
+        IdNode id = myExp.getIdNode();
+        boolean hasErr = false;
+
+        if (!(conditionType instanceof BoolType)) {
+            id.notifyError("Non-bool expression used as an if condition");
+            hasErr = true;
+        }
+
+        if (hasErr == false && myStmtList.typeCheck(t)) {
+            return true;
+        }
         return false;
     }
 

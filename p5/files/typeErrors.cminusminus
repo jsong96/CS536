@@ -7,6 +7,15 @@ void f(int p1, bool p2) {
 
 void main() {
     int aaa;
+    int x;
+
+    if (x == 1) {
+      cout << x;
+    }
+
+    if (x) {
+      
+    }
 
     // some errors involving illegal operations on functions
     aaa = f + f;
