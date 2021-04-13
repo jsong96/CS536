@@ -1,0 +1,9 @@
+struct Point {
+  int x;
+  int y;
+};
+
+struct Line {
+  struct Point p1;
+  struct Point p2;
+}

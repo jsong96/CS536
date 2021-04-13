@@ -1,0 +1,108 @@
+bool bbb;
+struct S { 
+  int a; 
+};
+
+struct Point {
+  int x;
+  int y;
+};
+
+struct Line {
+  struct Point p1;
+  struct Point p2;
+};
+
+struct S t;
+struct Point p1;
+struct Point p2;
+struct Line l;
+
+
+int foo (int x, int y) {
+  return x + y;
+}
+
+int bar () {
+  return; // 	Missing return value
+}
+
+int badReturn() {
+  return bbb; // 	Bad return value
+}
+
+void voidFunc() {
+  return;
+}
+
+void f(int p1, bool p2) {
+  cout << foo; // Attempt to write a function
+  cout << bar; // Attempt to write a function
+  cout << Point; // Attempt to write a struct name
+  cout << Line; // Attempt to write a struct name
+  cout << S; // Attempt to write a struct name
+  cout << p1; // Attempt to write a struct variable
+  cout << p2; // Attempt to write a struct variable
+  cout << voidFunc(); // Attempt to write void
+  return p1; // Return with a value in a void function
+}
+
+void main() {
+    int aaa;
+    cin >> foo; // Attempt to read a function
+    cin >> voidFunc; //Attempt to read a function
+    cin >> Point; // Attempt to read a struct name
+    cin >> Line; // Attempt to read a struct name
+    cin >> p1; // Attempt to read a struct variable
+    cin >> p2; // Attempt to read a struct variable
+    cin >> l; // Attempt to read a struct variable
+
+    aaa(); // Attempt to call a non-function
+    bbb(); // Attempt to call a non-function
+    p1(); // Attempt to call a non-function
+    l(); // Attempt to call a non-function
+
+    foo(); // Function call with wrong number of args
+    foo(aaa); // Function call with wrong number of args
+    foo(aaa, p1); // Type of actual does not match type of formal
+    foo(p1, p2); // Type of actual does not match type of formal
+    foo(p1, l); // Type of actual does not match type of formal
+
+    aaa + bbb; // Arithmetic operator applied to non-numeric operand
+    p1 + aaa; // Arithmetic operator applied to non-numeric operand
+    l + p2; // Arithmetic operator applied to non-numeric operand
+
+    if ((3 + 4) && true) { //Logical operator applied to non-bool operand & Non-bool expression used as an if condition
+    }
+    // some errors involving illegal operations on functions
+    aaa = f + f;
+    bbb = f == 3;
+    bbb = f > main;
+    bbb = f == f;
+
+    // some errors involving bad function calls 
+    aaa();
+    f();
+    f(5);
+    f(aaa, aaa);
+    f(t, t.a);
+    S();
+
+    // some errors involving structs 
+    t = 5;
+    t = t;
+    cin >> S;
+    t = true || 3;
+    bbb = S && t.a;
+
+    // error involving return
+    return 10;
+
+    // other type errors 
+    aaa = aaa + (!false);
+    aaa = aaa + "foo";
+    bbb = aaa;
+
+    // don't give too many or too few error messages here 
+    bbb = (aaa + true) && (bbb < true);
+}

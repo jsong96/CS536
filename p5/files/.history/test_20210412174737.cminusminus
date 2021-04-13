@@ -1,0 +1,30 @@
+struct Point {
+  int x;
+  int y;
+};
+
+struct Point p1;
+struct Point p2;
+
+struct Line {
+  struct Point p1;
+  struct Point p2;
+};
+
+int foo(int x, int y) {
+  return x - y;
+}
+
+void main() {
+  int x;
+  int y;
+
+
+  p1.x = 1;
+  p1.y = 2;
+  p2.x = 3;
+  p2.y = 4;
+
+  foo(, );
+  
+}

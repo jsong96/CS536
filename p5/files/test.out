@@ -1,0 +1,95 @@
+bool bbb;
+struct S{
+    int a;
+};
+
+struct Point{
+    int x;
+    int y;
+};
+
+struct Line{
+    struct Point p1;
+    struct Point p2;
+};
+
+struct S t;
+struct Point p1;
+struct Point p2;
+struct Line l;
+int barVal;
+void v(int a) {
+    return;
+}
+
+int foo(int x, int y) {
+    return (x(int) + y(int));
+}
+
+int bar() {
+    barVal(int) = 1;
+    return barVal(int);
+}
+
+void voidFunc() {
+    return;
+}
+
+bool boolFunc() {
+    return true;
+}
+
+void main() {
+    int x;
+    int y;
+    bool a;
+    bool b;
+    p1(Point).x(int) = 1;
+    p1(Point).y(int) = 2;
+    p2(Point).x(int) = 3;
+    p2(Point).y(int) = 4;
+    foo(int,int->int)(x(int), y(int));
+    p1(Point).x(int) = bar(->int)();
+    x(int) = bar(->int)();
+    if ((p1(Point).x(int) == x(int))) {
+        p2(Point).y(int)--;
+    }
+    else {
+        p2(Point).x(int)++;
+    }
+    if ((a(bool) == b(bool))) {
+        cout << p2(Point).x(int);
+    }
+    while ((a(bool) != b(bool))) {
+        cin >> x(int);
+        a(bool) = b(bool);
+    }
+    repeat (x(int)) {
+        voidFunc(->void)();
+        x(int)--;
+    }
+    a(bool) = (true && b(bool));
+    b(bool) = (false && a(bool));
+    a(bool) = (true || b(bool));
+    b(bool) = (false || a(bool));
+    a(bool) = (1 > 2);
+    a(bool) = (1 < 2);
+    b(bool) = (1 <= 3);
+    b(bool) = (1 >= 3);
+    x(int) = (1 - 2);
+    x(int) = (1 + 2);
+    x(int) = (1 / 2);
+    x(int) = (1 * 2);
+    if ((boolFunc(->bool)() && true)) {
+        x(int) = (x(int) + y(int));
+        x(int)++;
+        x(int)--;
+        y(int)++;
+        y(int)--;
+        if ((!boolFunc(->bool)())) {
+            return;
+        }
+    }
+    return;
+}
+

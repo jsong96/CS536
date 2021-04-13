@@ -1,0 +1,133 @@
+bool bbb;
+struct S { 
+  int a; 
+};
+
+struct Point {
+  int x;
+  int y;
+};
+
+struct Line {
+  struct Point p1;
+  struct Point p2;
+};
+
+struct S t;
+struct Point p1;
+struct Point p2;
+struct Line l;
+
+
+void v(int a) {
+  return;
+}
+
+int foo (int x, int y) {
+  return x + y;
+}
+
+int bar () {
+  return; // 	Missing return value
+}
+
+int badReturn() {
+  return bbb; // 	Bad return value
+}
+
+void voidFunc() {
+  return;
+}
+
+void f(int a, bool b) {
+  cout << foo; // Attempt to write a function
+  cout << bar; // Attempt to write a function
+  cout << Point; // Attempt to write a struct name
+  cout << Line; // Attempt to write a struct name
+  cout << S; // Attempt to write a struct name
+  cout << p1; // Attempt to write a struct variable
+  cout << p2; // Attempt to write a struct variable
+  cout << voidFunc(); // Attempt to write void
+  return a; // Return with a value in a void function
+}
+
+void main() {
+    int aaa;
+    int x;
+    int y;
+    bool q;
+    bool w;
+
+    cin >> foo; // Attempt to read a function
+    cin >> voidFunc; //Attempt to read a function
+    cin >> Point; // Attempt to read a struct name
+    cin >> Line; // Attempt to read a struct name
+    cin >> p1; // Attempt to read a struct variable
+    cin >> p2; // Attempt to read a struct variable
+    cin >> l; // Attempt to read a struct variable
+
+    aaa(); // Attempt to call a non-function
+    bbb(); // Attempt to call a non-function
+    p1(); // Attempt to call a non-function
+    l(); // Attempt to call a non-function
+
+    foo(); // Function call with wrong number of args
+    foo(aaa); // Function call with wrong number of args
+    foo(aaa, p1); // Type of actual does not match type of formal
+    foo(p1, p2); // Type of actual does not match type of formal * 2
+    foo(p1, l); // Type of actual does not match type of formal * 2
+
+    aaa = aaa + bbb; // Arithmetic operator applied to non-numeric operand
+    aaa = p1 + aaa; // Arithmetic operator applied to non-numeric operand
+    aaa = l + p2; // Arithmetic operator applied to non-numeric operand * 2
+
+    aaa = true; // 	Type mismatch
+
+    bbb = true || aaa; 	//Logical operator applied to non-bool operand
+    bbb = aaa && false; // Logical operator applied to non-bool operand
+    aaa = !foo; //Logical operator applied to non-bool operand
+    bbb = !bar; //Logical operator applied to non-bool operand
+
+    bbb = l > p2; // Relational operator applied to non-numeric operand * 2
+
+    if (q > aaa) { //	Relational operator applied to non-numeric operand & Non-bool expression used as an if condition
+
+    } 
+    if (aaa) { // Non-bool expression used as an if condition
+
+    } 
+    if (aaa) { // Non-bool expression used as an if condition
+
+    } else {
+
+    }
+
+    if (bbb != aaa) { // Type mismatch
+
+    }
+
+    while(p1 == l) { // Equality operator applied to struct names & Non-bool expression used as a while condition
+
+    }
+
+    while(aaa) { // Non-bool expression used as a while condition
+    }
+
+    repeat(bbb) { // Non-integer expression used as a repeat clause
+
+    }
+
+    repeat(bbb == aaa) { // Non-integer expression used as a repeat clause & Type mismatch
+
+    }
+    // don't give too many or too few error messages here 
+
+    cout << p1 + 1;
+    aaa = (true + 3) * 4;
+    bbb = true && (false || 3); 
+    v("a" * 4); 
+    aaa = 1 + p();
+    bbb = (true + 3) == x;
+
+    bbb = (aaa + true) && (bbb < true);
+}

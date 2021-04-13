@@ -1,0 +1,70 @@
+bool bbb;
+struct S { 
+  int a; 
+};
+
+struct Point {
+  int x;
+  int y;
+};
+
+struct Line {
+  struct Point p1;
+  struct Point p2;
+};
+
+struct S t;
+struct Point p1;
+struct Point p2;
+struct Line l;
+
+
+void v(int a) {
+  return;
+}
+
+int foo (int x, int y) {
+  return x + y;
+}
+
+int bar () {
+  int barVal = 1;
+  return barVal;
+}
+
+void voidFunc() {
+  return;
+}
+
+void main() {
+  int x;
+  int y;
+
+
+  p1.x = 1;
+  p1.y = 2;
+  p2.x = 3;
+  p2.y = 4;
+
+  foo(x, y);
+  p1.x = bar();
+  x = bar();
+
+  if (p1.x == x) {
+    p2.y--;
+  } else {
+    p2.x++;
+  }
+
+  if () {
+
+  }
+
+  while() {
+
+  }
+
+  repeat() {
+
+  }
+}

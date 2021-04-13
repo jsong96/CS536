@@ -1,0 +1,17 @@
+struct Point {
+  int x;
+  int y;
+};
+
+struct Line {
+  struct Point p1;
+  struct Point p2;
+};
+
+
+
+int foo(Point p1, Point p2) {
+  int length;
+
+  length = ((p2.x - p1.x) + (p2.y - p1.y)); 
+}

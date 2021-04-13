@@ -1,0 +1,44 @@
+struct Point {
+  int x;
+  int y;
+};
+
+struct Point p1;
+struct Point p2;
+
+struct Line {
+  struct Point p1;
+  struct Point p2;
+  int length;
+};
+
+int foo(int x, int y) {
+  return x - y;
+}
+
+void bar() {
+  int a;
+  int b;
+  cout << "this function is called bar()";  
+  cin >> a;
+  a = 1;
+  b = 1;
+
+  foo (a, b);
+  return;
+}
+
+void main() {
+  int x;
+  int y;
+
+
+  p1.x = 1;
+  p1.y = 2;
+  p2.x = 3;
+  p2.y = 4;
+
+  foo(x, y);
+  bar();
+  
+}
