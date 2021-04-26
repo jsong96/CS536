@@ -58,6 +58,10 @@ void main() {
     bool q;
     bool w;
 
+    x = -q; // Arithmetic operator applied to non-numeric operand
+    x = -foo; // Arithmetic operator applied to non-numeric operand
+    x = -foo(1,2);
+
     cin >> foo; // Attempt to read a function
     cin >> voidFunc; //Attempt to read a function
     cin >> Point; // Attempt to read a struct name

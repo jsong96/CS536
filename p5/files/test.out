@@ -51,6 +51,8 @@ void main() {
     foo(int,int->int)(x(int), y(int));
     p1(Point).x(int) = bar(->int)();
     x(int) = bar(->int)();
+    x(int) = (-y(int));
+    x(int) = (-foo(int,int->int)(x(int), y(int)));
     if ((p1(Point).x(int) == x(int))) {
         p2(Point).y(int)--;
     }

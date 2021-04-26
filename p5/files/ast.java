@@ -2024,9 +2024,11 @@ class UnaryMinusNode extends UnaryExpNode {
 
     public Type typeCheck() {
         Type t = myExp.typeCheck();
+        IdNode id = myExp.getIdNode();
         if (t instanceof ErrorType) {
             return new ErrorType();
         } else if (!(t instanceof IntType)) {
+            id.notifyError("Arithmetic operator applied to non-numeric operand");
             return new ErrorType();
         } else {
             return t;
