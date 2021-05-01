@@ -134,6 +134,7 @@ class ProgramNode extends ASTnode {
      */
     public void nameAnalysis() {
         SymTable symTab = new SymTable();
+        TSym.setLocalOffset(Codegen.GLOBAL);
         myDeclList.nameAnalysis(symTab);
         if (!myDeclList.checkMain()) {
             ErrMsg.fatal(0, 0, "No main function");
@@ -185,7 +186,7 @@ class DeclListNode extends ASTnode {
             if (node instanceof VarDeclNode) {
                 ((VarDeclNode) node).nameAnalysis(symTab, globalTab);
                 ((VarDeclNode) node).getTSym().setOffset(offset);
-                if (offset != 1) {
+                if (offset != Codegen.GLOBAL) {
                     offset -= 4;
                 }
             } else {
@@ -302,8 +303,11 @@ class FnBodyNode extends ASTnode {
      */
     public void nameAnalysis(SymTable symTab) {
         // need to compute offset
+        TSym.setLocalOffset(-8);
         myDeclList.nameAnalysis(symTab);
         myStmtList.nameAnalysis(symTab);
+        int offset = TSym.getLocalOffset();
+        this.sizeLocals = (offset + 8) * (-1);
     }
 
     /**
@@ -557,8 +561,8 @@ class VarDeclNode extends DeclNode {
 
     public void codeGen() {
         System.out.println(myId.sym() + " " + myId.name() + " offset: " + myId.sym().getOffset());
-        // global var
-        if (myId.sym().getOffset() == 1) {
+        // consider only global varDecl
+        if (myId.sym().getOffset() == Codegen.GLOBAL) {
             Codegen.p.print(Codegen.addGlobalVar(myId.name()));
         }
     }
@@ -660,16 +664,18 @@ class FnDeclNode extends DeclNode {
     public void codeGen() {
 
         String fnName = myId.name();
-        String fnEndLabel = Codegen.nextLabel();
+        String fnEndLabel = "";
         System.out.println("Function name: " + fnName + " " + fnEndLabel);
         // Function entry
         if (fnName.equals("main")) {
+            fnEndLabel = "_main_Exit";
             Codegen.generate(".text");
             Codegen.generate(".globl main");
             Codegen.generateLabeled("main", "", "METHOD ENTRY");
             // SPIM
             Codegen.generateLabeled("__start", "", "");
         } else {
+            fnEndLabel = Codegen.nextLabel();
             Codegen.generate(".text");
             Codegen.generateLabeled("_", fnName, "", "METHOD ENTRY");
         }
@@ -685,10 +691,12 @@ class FnDeclNode extends DeclNode {
 
         // run codegen for function body
         myBody.codeGen(fnEndLabel);
-        // generate function label
-        Codegen.genLabel(fnEndLabel);
+
         // DEBUG TODO: erase later
         Codegen.p.print("\t\t#FUNCTION EXIT\n");
+
+        // generate function label
+        Codegen.genLabel(fnEndLabel);
         // load return addresss
         Codegen.generateIndexed("lw", Codegen.RA, Codegen.FP, 0);
         // save control link
@@ -697,8 +705,14 @@ class FnDeclNode extends DeclNode {
         Codegen.generateIndexed("lw", Codegen.FP, Codegen.FP, -4);
         // restore SP
         Codegen.generate("move", Codegen.SP, Codegen.T0);
-        // return
-        Codegen.generate("jr", Codegen.RA);
+        if (!fnName.equals("main")) {
+            // return
+            Codegen.generate("jr", Codegen.RA);
+        } else {
+            // load exit code for syscall
+            Codegen.generate("li", Codegen.V0, 10);
+            Codegen.generate("syscall");
+        }
 
     }
 
@@ -1293,10 +1307,15 @@ class IfElseStmtNode extends StmtNode {
      * new scope - process the decls and stmts of else - exit the scope
      */
     public void nameAnalysis(SymTable symTab) {
+        int startOffset, ifOffset, elseOffset, finalOffset;
         myExp.nameAnalysis(symTab);
         symTab.addScope();
+        // get offset before analyzing the function body
+        startOffset = TSym.getLocalOffset();
         myThenDeclList.nameAnalysis(symTab);
         myThenStmtList.nameAnalysis(symTab);
+        // get offset after analyzing the if body
+        ifOffset = TSym.getLocalOffset();
         try {
             symTab.removeScope();
         } catch (EmptySymTableException ex) {
@@ -1304,8 +1323,19 @@ class IfElseStmtNode extends StmtNode {
             System.exit(-1);
         }
         symTab.addScope();
+        // reset the offset
+        TSym.setLocalOffset(startOffset);
         myElseDeclList.nameAnalysis(symTab);
         myElseStmtList.nameAnalysis(symTab);
+        // get offset after analyzing the else body
+        elseOffset = TSym.getLocalOffset();
+        // choose the lower offset
+        if (ifOffset > elseOffset) {
+            finalOffset = elseOffset;
+        } else {
+            finalOffset = ifOffset;
+        }
+        TSym.setLocalOffset(finalOffset);
         try {
             symTab.removeScope();
         } catch (EmptySymTableException ex) {
@@ -1332,7 +1362,7 @@ class IfElseStmtNode extends StmtNode {
         String trueLab = Codegen.nextLabel();
         String falseLab = Codegen.nextLabel();
         String doneLab = Codegen.nextLabel();
-
+        // control - flow
         myExp.codeGenJumpAndLink(trueLab, falseLab);
 
         Codegen.genLabel(trueLab);
@@ -1579,7 +1609,7 @@ class ReturnStmtNode extends StmtNode {
             // pop the value into register V0 or register F0
             Codegen.genPop(Codegen.V0);
         }
-        // label the return code
+        // generate a jump to the label
         Codegen.generate("b", fnEndLabel);
     }
 
@@ -1863,7 +1893,8 @@ class IdNode extends ExpNode {
      * helper method for codeGen functions in IdNode
      */
     public void codeGenLoad(String command) {
-        if (mySym.getOffset() != 1) {
+        // if it is local
+        if (mySym.getOffset() != Codegen.GLOBAL) {
             Codegen.generateIndexed(command, Codegen.T0, Codegen.FP, mySym.getOffset());
         } else {
             Codegen.generate(command, Codegen.T0, "_" + myStrVal);

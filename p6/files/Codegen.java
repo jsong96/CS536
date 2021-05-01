@@ -26,6 +26,7 @@ public class Codegen {
     // file into which generated code is written
     public static PrintWriter p = null;
     public static HashMap<String, String> strLabelMap;
+    public static final int GLOBAL = -1;
 
     // values of true and false
     public static final String TRUE = "1";

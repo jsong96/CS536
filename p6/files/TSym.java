@@ -6,12 +6,11 @@ import java.util.*;
  */
 public class TSym {
     private Type type;
-    private int offset;
+    private int offset = 0;
     private static int localOffset = -8;
 
     public TSym(Type type) {
         this.type = type;
-        this.offset = 0;
     }
 
     public Type getType() {
@@ -49,15 +48,13 @@ class FnSym extends TSym {
     private Type returnType;
     private int numParams;
     private List<Type> paramTypes;
-    private int sizeParams;
-    private int sizeLocals;
+    private int sizeParams = 0;
+    private int sizeLocals = 0;
 
     public FnSym(Type type, int numparams) {
         super(new FnType());
         returnType = type;
         numParams = numparams;
-        this.sizeParams = 0;
-        this.sizeLocals = 0;
     }
 
     public void addFormals(List<Type> L) {
