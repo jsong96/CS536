@@ -665,10 +665,10 @@ class FnDeclNode extends DeclNode {
         // Function entry
         if (fnName.equals("main")) {
             Codegen.generate(".text");
-            Codegen.generate(".global main");
+            Codegen.generate(".globl main");
             Codegen.generateLabeled("main", "", "METHOD ENTRY");
             // SPIM
-            Codegen.generateLabeled("__start", "", "add __start label for main only");
+            Codegen.generateLabeled("__start", "", "");
         } else {
             Codegen.generate(".text");
             Codegen.generateLabeled("_", fnName, "", "METHOD ENTRY");
@@ -970,7 +970,7 @@ class AssignStmtNode extends StmtNode {
     }
 
     public void codeGen(String fnEndLabel) {
-        myAssign.codeGen();
+        myAssign.codeGenExp();
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -1178,7 +1178,7 @@ class WriteStmtNode extends StmtNode {
 
     public void codeGen(String fnEndLabel) {
         // call the codeGen method of the expression being printed
-        myExp.codeGen();
+        myExp.codeGenExp();
 
         Type eType = myExp.typeCheck();
         // Pop the top of stack value
@@ -1189,9 +1189,9 @@ class WriteStmtNode extends StmtNode {
         // String - 4, int - 1
         int registerOffset = 0;
         if (eType.isStringType()) {
-            registerOffset = 1;
-        } else if (eType.isIntType()) {
             registerOffset = 4;
+        } else if (eType.isIntType()) {
+            registerOffset = 1;
         }
         // generate code to set register V0
         Codegen.generate("li", Codegen.V0, registerOffset);
@@ -1698,10 +1698,12 @@ class StringLitNode extends ExpNode {
         if (Codegen.strLabelMap.containsKey(myStrVal)) {
             myLabel = Codegen.strLabelMap.get(myStrVal);
         } else {
+
             // store the string literal in the static data area
             Codegen.generate(".data");
             myLabel = Codegen.nextLabel();
-            Codegen.generate(myLabel, ".asciiz", myStrVal);
+            System.out.println(myLabel);
+            Codegen.p.print(String.format("%s:\t.asciiz %s\n", myLabel, myStrVal));
 
             // string literal onto the stack
             Codegen.generate(".text");
