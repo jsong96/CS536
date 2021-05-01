@@ -560,7 +560,8 @@ class VarDeclNode extends DeclNode {
     }
 
     public void codeGen() {
-        System.out.println(myId.sym() + " " + myId.name() + " offset: " + myId.sym().getOffset());
+        // System.out.println(myId.sym() + " " + myId.name() + " offset: " +
+        // myId.sym().getOffset());
         // consider only global varDecl
         if (myId.sym().getOffset() == Codegen.GLOBAL) {
             Codegen.p.print(Codegen.addGlobalVar(myId.name()));
@@ -665,7 +666,7 @@ class FnDeclNode extends DeclNode {
 
         String fnName = myId.name();
         String fnEndLabel = "";
-        System.out.println("Function name: " + fnName + " " + fnEndLabel);
+        // System.out.println("Function name: " + fnName + " " + fnEndLabel);
         // Function entry
         if (fnName.equals("main")) {
             fnEndLabel = "_main_Exit";
@@ -673,7 +674,7 @@ class FnDeclNode extends DeclNode {
             Codegen.generate(".globl main");
             Codegen.generateLabeled("main", "", "METHOD ENTRY");
             // SPIM
-            Codegen.generateLabeled("__start", "", "");
+            Codegen.generateLabeled("_start", "", "");
         } else {
             fnEndLabel = Codegen.nextLabel();
             Codegen.generate(".text");
@@ -687,7 +688,10 @@ class FnDeclNode extends DeclNode {
         // set the FP
         Codegen.generate("addu", Codegen.FP, Codegen.SP, 8);
         // push space for locals
-        Codegen.generate("subu", Codegen.SP, Codegen.SP, ((FnSym) this.myId.sym()).getSizeLocals());
+        int localSize = ((FnSym) this.myId.sym()).getSizeLocals();
+        if (localSize > 0) {
+            Codegen.generate("subu", Codegen.SP, Codegen.SP, ((FnSym) this.myId.sym()).getSizeLocals());
+        }
 
         // run codegen for function body
         myBody.codeGen(fnEndLabel);
@@ -984,6 +988,7 @@ class AssignStmtNode extends StmtNode {
     }
 
     public void codeGen(String fnEndLabel) {
+        Codegen.p.print(String.format("\t\t#%s\n", "ASSIGN"));
         myAssign.codeGenExp();
     }
 
@@ -1022,6 +1027,7 @@ class PostIncStmtNode extends StmtNode {
     }
 
     public void codeGen(String fnEndLabel) {
+        Codegen.p.print(String.format("\t\t#%s\n", "POST INC"));
         IdNode iNode = (IdNode) myExp;
         iNode.codeGenAddr();
         iNode.codeGenExp();
@@ -1069,6 +1075,7 @@ class PostDecStmtNode extends StmtNode {
     }
 
     public void codeGen(String fnEndLabel) {
+        Codegen.p.print(String.format("\t\t#%s\n", "POST DEC"));
         IdNode iNode = (IdNode) myExp;
         iNode.codeGenAddr();
         iNode.codeGenExp();
@@ -1124,6 +1131,7 @@ class ReadStmtNode extends StmtNode {
     }
 
     public void codeGen(String fnEndLabel) {
+        Codegen.p.print(String.format("\t\t#%s\n", "READ"));
         // generate code to read an integer val into register V0
         Codegen.generate("li", Codegen.V0, 5);
         // generate code to call syscall
@@ -1191,6 +1199,7 @@ class WriteStmtNode extends StmtNode {
     }
 
     public void codeGen(String fnEndLabel) {
+        Codegen.p.print(String.format("\t\t#%s\n", "WRITE"));
         // call the codeGen method of the expression being printed
         myExp.codeGenExp();
 
@@ -1198,7 +1207,7 @@ class WriteStmtNode extends StmtNode {
         // Pop the top of stack value
         Codegen.genPop(Codegen.T0);
         // load the pop value to the register A0
-        Codegen.generate("move", Codegen.A0, Codegen.T0);
+        // Codegen.generate("move", Codegen.A0, Codegen.T0);
         // generate register offset
         // String - 4, int - 1
         int registerOffset = 0;
@@ -1265,8 +1274,9 @@ class IfStmtNode extends StmtNode {
         // Control-flow approach
         String trueLab = Codegen.nextLabel();
         String doneLab = Codegen.nextLabel();
-        // DEBUG
-        System.out.println("<if stmt> trueLab: " + trueLab + " done lab: " + doneLab);
+        // // DEBUG
+        // System.out.println("<if stmt> trueLab: " + trueLab + " done lab: " +
+        // doneLab);
         myExp.codeGenJumpAndLink(trueLab, doneLab);
         Codegen.genLabel(trueLab);
         // generate code for the statement list
@@ -1732,7 +1742,7 @@ class StringLitNode extends ExpNode {
             // store the string literal in the static data area
             Codegen.generate(".data");
             myLabel = Codegen.nextLabel();
-            System.out.println(myLabel);
+            // System.out.println(myLabel);
             Codegen.p.print(String.format("%s:\t.asciiz %s\n", myLabel, myStrVal));
 
             // string literal onto the stack
