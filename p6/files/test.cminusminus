@@ -1,4 +1,9 @@
+int g;
+int d;
+int x;
+
 void main() {
+    g = 1;
     cout << "Hello world!";
     cout << "\n";
 }

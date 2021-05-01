@@ -1205,9 +1205,7 @@ class WriteStmtNode extends StmtNode {
 
         Type eType = myExp.typeCheck();
         // Pop the top of stack value
-        Codegen.genPop(Codegen.T0);
-        // load the pop value to the register A0
-        // Codegen.generate("move", Codegen.A0, Codegen.T0);
+        Codegen.genPop(Codegen.A0);
         // generate register offset
         // String - 4, int - 1
         int registerOffset = 0;
@@ -1559,7 +1557,7 @@ class CallStmtNode extends StmtNode {
 
     public void codeGen(String fnEndLabel) {
         myCall.codeGen();
-        // pop the value?
+        Codegen.genPop(Codegen.V0);
     }
 
     public void unparse(PrintWriter p, int indent) {
